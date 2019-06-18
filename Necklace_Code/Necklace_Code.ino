@@ -46,7 +46,7 @@ void getValues(){
   GyroY=Wire.read()<<8|Wire.read();
   GyroZ=Wire.read()<<8|Wire.read();
 }
-
+//Individual Vibraor Strength from 0-255
 void tactValues(float accx, float accy, int* tactArray){
   if (accy<0 && accx>0){
      tactArray[0]=((abs(accy)-zeroy)/64)+30;
@@ -90,6 +90,9 @@ void tactValues(float accx, float accy, int* tactArray){
   }
   else{
     Serial.println("uh oh! something failed!");
+    for (int i=0; i<=7; i++) {
+      tactArray[i]=0;  
+    }
     tactArray[0]=0;
     tactArray[1]=0;
     tactArray[2]=0;
@@ -103,37 +106,11 @@ void tactValues(float accx, float accy, int* tactArray){
 }
 
 void Circle (){
-  SoftPWMSet(vpins[0],255);
-  delay(125);
-  SoftPWMSet(vpins[0],0);
-  
-  SoftPWMSet(vpins[1],255);
-  delay(125);
-  SoftPWMSet(vpins[1],0);
-  
-  SoftPWMSet(vpins[2],255);
-  delay(125);
-  SoftPWMSet(vpins[2],0);
-  
-  SoftPWMSet(vpins[3],255);
-  delay(125);
-  SoftPWMSet(vpins[3],0);
-  
-  SoftPWMSet(vpins[4],255);
-  delay(125);
-  SoftPWMSet(vpins[4],0);
-  
-  SoftPWMSet(vpins[5],255);
-  delay(125);
-  SoftPWMSet(vpins[5],0);
-  
-  SoftPWMSet(vpins[6],255);
-  delay(125);
-  SoftPWMSet(vpins[6],0);
-  
-  SoftPWMSet(vpins[7],255);
-  delay(125);
-  SoftPWMSet(vpins[7],0);
+  for(int i=0; i<=7; i++){
+    SoftPWMSet(vpins[i],255);
+    delay(125);
+    SoftPWMSet(vpins[i],0);
+  }
 }
 void Pulse (){
   SoftPWMSet(vpins[0],255);
@@ -163,7 +140,6 @@ int scaler(float input){
     return (50+(130*(input/255))); //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
 //  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
   }
-  //return(40); scale based on what is realistic for vibrator strength
 }
 
 void setup() {
@@ -175,80 +151,11 @@ void setup() {
   Wire.write(0);
   Wire.endTransmission(true);
   Serial.begin(9600);
-  pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(4,OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
+  for(int i=0; i<=7; i++) {
+    pinMode(vpins[i], OUTPUT);
+  }
   Circle();
   Circle();
-//  SoftPWMSet(vpins[0],255);
-//  delay(125); 
-//  SoftPWMSet(vpins[0],0);
-//  
-//  SoftPWMSet(vpins[1],255);
-//  delay(125);
-//  SoftPWMSet(vpins[1],0);
-//  
-//  SoftPWMSet(vpins[2],255);
-//  delay(125);
-//  SoftPWMSet(vpins[2],0);
-//  
-//  SoftPWMSet(vpins[3],255);
-//  delay(125);
-//  SoftPWMSet(vpins[3],0);
-//  
-//  SoftPWMSet(vpins[4],255);
-//  delay(125);
-//  SoftPWMSet(vpins[4],0);
-//  
-//  SoftPWMSet(vpins[5],255);
-//  delay(125);
-//  SoftPWMSet(vpins[5],0);
-//  
-//  SoftPWMSet(vpins[6],255);
-//  delay(125);
-//  SoftPWMSet(vpins[6],0);
-//  
-//  SoftPWMSet(vpins[7],255);
-//  delay(125);
-//  SoftPWMSet(vpins[7],0);
-//
-//  SoftPWMSet(vpins[0],255);
-//  delay(125);
-//  SoftPWMSet(vpins[0],0);
-//  
-//  SoftPWMSet(vpins[1],255);
-//  delay(125);
-//  SoftPWMSet(vpins[1],0);
-//  
-//  SoftPWMSet(vpins[2],255);
-//  delay(125);
-//  SoftPWMSet(vpins[2],0);
-//  
-//  SoftPWMSet(vpins[3],255);
-//  delay(125);
-//  SoftPWMSet(vpins[3],0);
-//  
-//  SoftPWMSet(vpins[4],255);
-//  delay(125);
-//  SoftPWMSet(vpins[4],0);
-//  
-//  SoftPWMSet(vpins[5],255);
-//  delay(125);
-//  SoftPWMSet(vpins[5],0);
-//  
-//  SoftPWMSet(vpins[6],255);
-//  delay(125);
-//  SoftPWMSet(vpins[6],0);
-//  
-//  SoftPWMSet(vpins[7],255);
-//  delay(125);
-//  SoftPWMSet(vpins[7],0);
-
   getValues(); //get acc values
   oldvalueAccelX = AccX;
   oldvalueAccelY = AccY;
@@ -279,67 +186,6 @@ void setup() {
 delay(500);
 Pulse();
 Pulse();
-
-//  SoftPWMSet(vpins[0],255);
-//  SoftPWMSet(vpins[1],255);
-//  SoftPWMSet(vpins[2],255);
-//  SoftPWMSet(vpins[3],255);
-//  SoftPWMSet(vpins[4],255);
-//  SoftPWMSet(vpins[5],255);
-//  SoftPWMSet(vpins[6],255);
-//  SoftPWMSet(vpins[7],255);
-//  delay(125);
-//
-//  SoftPWMSet(vpins[0],0);
-//  SoftPWMSet(vpins[1],0);
-//  SoftPWMSet(vpins[2],0);
-//  SoftPWMSet(vpins[3],0);
-//  SoftPWMSet(vpins[4],0);
-//  SoftPWMSet(vpins[5],0);
-//  SoftPWMSet(vpins[6],0);
-//  SoftPWMSet(vpins[7],0);
-//  delay(125);
-//  
-//  SoftPWMSet(vpins[0],255);
-//  SoftPWMSet(vpins[1],255);
-//  SoftPWMSet(vpins[2],255);
-//  SoftPWMSet(vpins[3],255);
-//  SoftPWMSet(vpins[4],255);
-//  SoftPWMSet(vpins[5],255);
-//  SoftPWMSet(vpins[6],255);
-//  SoftPWMSet(vpins[7],255);
-//  delay(125);
-//
-//  SoftPWMSet(vpins[0],0);
-//  SoftPWMSet(vpins[1],0);
-//  SoftPWMSet(vpins[2],0);
-//  SoftPWMSet(vpins[3],0);
-//  SoftPWMSet(vpins[4],0);
-//  SoftPWMSet(vpins[5],0);
-//  SoftPWMSet(vpins[6],0);
-//  SoftPWMSet(vpins[7],0);
-//  delay(125);
-
-//  for(int i=0; i<6; i++){
-//    pinMode(vpins[i],OUTPUT); //letting Arduino know that the vibrators will be recieving information from it
-//    analogWrite(vpins[i], 0); //setting all vibrator to start off (sinking current), no starting vibration when turned on  
-  //pinMode(vpin1, OUTPUT); //letting Arduino know that the vibrators will be recieving information from it
-  //pinMode(vpin2, OUTPUT);
-  //pinMode(vpin3, OUTPUT);
-  //pinMode(vpin4, OUTPUT);
-  //pinMode(vpin5, OUTPUT);
-  //pinMode(vpin6, OUTPUT);
-  //pinMode(vpin7, OUTPUT);
-  //pinMode(vpin8, OUTPUT);
-  
-  //digitalWrite(vpin1, HIGH); //setting all vibrator to start off, no starting vibration whe turned on
-  //digitalWrite(vpin2, HIGH);
-  //digitalWrite(vpin3, HIGH);
-  //digitalWrite(vpin4, HIGH);
-  //digitalWrite(vpin5, HIGH);
-  //digitalWrite(vpin6, HIGH);
-  //digitalWrite(vpin7, HIGH);
-  //digitalWrite(vpin8, HIGH);
 }
 
 
@@ -371,34 +217,9 @@ void loop() {
     oldvalueTemp = (oldvalueTemp + newvalueTemp)/2;
   }
   tactValues(oldvalueAccelX,oldvalueAccelY, myValues);
-  
-  SoftPWMSet(2, scaler(myValues[0])); //tactor 0
-  SoftPWMSet(3, scaler(myValues[1])); //tactor 1
-  SoftPWMSet(4, scaler(myValues[2])); //tactor 2
-  SoftPWMSet(5, scaler(myValues[3])); //tactor 3
-  SoftPWMSet(6, scaler(myValues[4])); //tactor 4
-  SoftPWMSet(9, scaler(myValues[5])); //tactor 5
-  SoftPWMSet(10, scaler(myValues[6])); //tactor 6
-  SoftPWMSet(11, scaler(myValues[7])); //tactor 7
-  
-//  Serial.print("RawTact 0= ");
-//  Serial.println(myValues[0]);
-//  Serial.print("RawTact 1= ");
-//  Serial.println(myValues[1]);
-//  Serial.print("RawTact 2= ");
-//  Serial.println(myValues[2]);
-//  Serial.print("RawTact 3= ");
-//  Serial.println(myValues[3]);
-//  Serial.print("RawTact 4= ");
-//  Serial.println(myValues[4]);
-//  Serial.print("RawTact 5= ");
-//  Serial.println(myValues[5]);
-//  Serial.print("RawTact 6= ");
-//  Serial.println(myValues[6]);
-//  Serial.print("RawTact 7= ");
-//  Serial.println(myValues[7]);
-
-
+  for (int i=0; i<=7; i++) {
+    SoftPWMSet(vpins[i], scaler(myValues[i]));
+  }
   Serial.print("tact 0= ");
   Serial.println(scaler(myValues[0]));
   Serial.print("tact 1= ");
