@@ -1,23 +1,31 @@
-#include "SoftPWM.h"
+/* Aiden and Jonny (Date started= Summer 2018, Date completed 6/19/19): 
+ *  Our tactile necklace was created with the goal of allowing a spatially disoriented wearer to be able to better understand his/her position relative to gravity. 
+ *  The necklace operates using an accelerometer and gyroscope Arduino microcontroller which transmits data to an Arduino Nano. 
+ *  The Nano then interprets the accelerometer/ gyroscope data and converts it into an output in the form of vibrations in the necklace. 
+ *  The necklace consists of eight brush motor vibrators that pulsate independently based on the position of the sensor. 
+ *  https://github.com/AidenKunkler-Peck/Tactile-Necklace
+*/
+//Including the libraries used in the code
+#include <SoftPWM.h>
 #include<Wire.h>
 
-//Global Variables
-float oldvalue;
-float newvalue;
-float oldvalueAccelX;
-float oldvalueAccelY;
-float oldvalueAccelZ;
-float oldvalueGyroX;
-float oldvalueGyroY;
-float oldvalueGyroZ;
-float oldvalueTemp;
+//establishing Global Variables
+float oldvalue;//used later in averaging formula
+float newvalue;//used later in averaging formula
+float oldvalueAccelX;//used for averaging accelerometer values in the x-axis
+float oldvalueAccelY;//used for averaging accelerometer values in the y-axis
+float oldvalueAccelZ;//used for averaging accelerometer values in the z-axis
+float oldvalueGyroX;//used for averaging gyroscope values in the x-axis
+float oldvalueGyroY;//used for averaging gyroscope values in the y-axis
+float oldvalueGyroZ;//used for averaging gyroscope values in the z-axis
+//float oldvalueTemp;
 float newvalueAccelX;
 float newvalueAccelY;
 float newvalueAccelZ;
 float newvalueGyroX; 
 float newvalueGyroY;
 float newvalueGyroZ;
-float newvalueTemp;
+//float newvalueTemp;
 float zerox;
 float zeroy;
 float avgx;
@@ -31,8 +39,8 @@ const int vMax=255;//max strength of vibrator is 255, exceeding 255 with overflo
 int myValues[8]; //defining a new array
 
 const int MPU6050_addr=0x68;
-int16_t AccX,AccY,AccZ,Temp,GyroX,GyroY,GyroZ;
-
+int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
+//Beginning communication with the accelerometer/gyroscopre Arduino "Wire.beginTransmission"
 void getValues(){
   Wire.beginTransmission(MPU6050_addr);
   Wire.write(0x3B);
@@ -41,70 +49,44 @@ void getValues(){
   AccX=Wire.read()<<8|Wire.read();
   AccY=Wire.read()<<8|Wire.read();
   AccZ=Wire.read()<<8|Wire.read();
-  Temp=Wire.read()<<8|Wire.read();
+//  Temp=Wire.read()<<8|Wire.read();
   GyroX=Wire.read()<<8|Wire.read();
   GyroY=Wire.read()<<8|Wire.read();
   GyroZ=Wire.read()<<8|Wire.read();
 }
 //Individual Vibraor Strength from 0-255
+void clearTacts(int*  tactArray) {
+  for (int i=0; i<=7; i++) {
+      tactArray[i]=0;
+  }
+}
+//tactValues=acquiring the vibrator strength values from the accelerometer/gyroscope Arduino
+//tactArray=formula for converting Arduino acceleroemter/gyroscope values to output tactor strength values (each tactor has a seperate formula specific to the desired output of each vibrator relative to the orientation of the Arduino)
+//"if"/"else if"=if the conditions of the "if" function are met then the code within the function is carried out, if the conditions are not met the next "else if" function is evaluated
 void tactValues(float accx, float accy, int* tactArray){
+  clearTacts(tactArray);
   if (accy<0 && accx>0){
      tactArray[0]=((abs(accy)-zeroy)/64)+30;
      tactArray[1]=sqrt(pow(accx-zerox,2)+pow(accy+zeroy,2))/64;
-     tactArray[2]=(accx-zerox)/64;
-     tactArray[3]=0;
-     tactArray[4]=0;
-     tactArray[5]=0;
-     tactArray[6]=0;
-     tactArray[7]=0;  
+     tactArray[2]=(accx-zerox)/64;  
   }
   else if (accy<0 && accx<0){
-    tactArray[0]=0;
-    tactArray[1]=0;
     tactArray[2]=(abs(accx)-zerox)/64;
     tactArray[3]=sqrt(pow(accx+zerox,2)+pow(accy+zeroy,2))/64;
     tactArray[4]=((abs(accy)-zeroy)/64)+30;
-    tactArray[5]=0;
-    tactArray[6]=0;
-    tactArray[7]=0;
   }
   else if (accy>0 && accx<0){
-    tactArray[0]=0;
-    tactArray[1]=0;
-    tactArray[2]=0;
-    tactArray[3]=0;
     tactArray[4]=(abs(accy-zeroy)/64)+30;
     tactArray[5]=sqrt(pow(accx+zerox,2)+pow(accy-zeroy,2))/64;
-    tactArray[6]=(abs(accx)-zerox)/64;
-    tactArray[7]=0;  
+    tactArray[6]=(abs(accx)-zerox)/64;  
   }
   else if (accy>0 && accx>0){
     tactArray[0]=((accy-zeroy)/64)+30;  
-    tactArray[1]=0;
-    tactArray[2]=0;
-    tactArray[3]=0;
-    tactArray[4]=0;
-    tactArray[5]=0;
     tactArray[6]=(abs(accx)-zerox)/64;
     tactArray[7]=sqrt(pow(accx-zerox,2)+pow(accy-zeroy,2))/64;
   }
-  else{
-    Serial.println("uh oh! something failed!");
-    for (int i=0; i<=7; i++) {
-      tactArray[i]=0;  
-    }
-    tactArray[0]=0;
-    tactArray[1]=0;
-    tactArray[2]=0;
-    tactArray[3]=0;
-    tactArray[4]=0;
-    tactArray[5]=0;
-    tactArray[6]=0;
-    tactArray[7]=0;  
-  }
-  //return(tactArray[0,1,2,3,4,5,6,7]);
 }
-
+//turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
 void Circle (){
   for(int i=0; i<=7; i++){
     SoftPWMSet(vpins[i],255);
@@ -112,24 +94,15 @@ void Circle (){
     SoftPWMSet(vpins[i],0);
   }
 }
+//turns all vibrators on and then off to simulate a pulsation
 void Pulse (){
-  SoftPWMSet(vpins[0],255);
-  SoftPWMSet(vpins[1],255);
-  SoftPWMSet(vpins[2],255);
-  SoftPWMSet(vpins[3],255);
-  SoftPWMSet(vpins[4],255);
-  SoftPWMSet(vpins[5],255);
-  SoftPWMSet(vpins[6],255);
-  SoftPWMSet(vpins[7],255);
+   for(int i=0; i<8; i++){
+    SoftPWMSet(vpins[i],255);
+   }
   delay(125);
-  SoftPWMSet(vpins[0],0);
-  SoftPWMSet(vpins[1],0);
-  SoftPWMSet(vpins[2],0);
-  SoftPWMSet(vpins[3],0);
-  SoftPWMSet(vpins[4],0);
-  SoftPWMSet(vpins[5],0);
-  SoftPWMSet(vpins[6],0);
-  SoftPWMSet(vpins[7],0);
+  for(int i=0; i<8; i++){
+    SoftPWMSet(vpins[i],0);
+   }
   delay(125);
 }
 int scaler(float input){
@@ -141,7 +114,6 @@ int scaler(float input){
 //  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
   }
 }
-
 void setup() {
   // put your setup code here, to run once:
   SoftPWMBegin();
@@ -163,7 +135,7 @@ void setup() {
   oldvalueGyroX = GyroX;
   oldvalueGyroY = GyroY;
   oldvalueGyroZ = GyroZ;
-  oldvalueTemp = Temp;
+//  oldvalueTemp = Temp;
   for(int avg = 0;avg < 150;avg++){
     getValues();
     newvalueAccelX = AccX;
@@ -172,14 +144,14 @@ void setup() {
     newvalueGyroX = GyroX;
     newvalueGyroY = GyroY;
     newvalueGyroZ = GyroZ;
-    newvalueTemp = Temp;
+//    newvalueTemp = Temp;
     oldvalueAccelX = (oldvalueAccelX + newvalueAccelX)/2;
     oldvalueAccelY = (oldvalueAccelY + newvalueAccelY)/2;
     oldvalueAccelZ = (oldvalueAccelZ + newvalueAccelZ)/2;
     oldvalueGyroX = (oldvalueGyroX + newvalueGyroX)/2;
     oldvalueGyroY = (oldvalueGyroY + newvalueGyroY)/2;
     oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
-    oldvalueTemp = (oldvalueTemp + newvalueTemp)/2;
+//    oldvalueTemp = (oldvalueTemp + newvalueTemp)/2;
   }
   zerox=oldvalueAccelX;
   zeroy=oldvalueAccelY;
@@ -187,10 +159,7 @@ delay(500);
 Pulse();
 Pulse();
 }
-
-
 void loop() {
-  // put your main code here, to run repeatedly:
   getValues(); //get acc values
   oldvalueAccelX = AccX;
   oldvalueAccelY = AccY;
@@ -198,7 +167,7 @@ void loop() {
   oldvalueGyroX = GyroX;
   oldvalueGyroY = GyroY;
   oldvalueGyroZ = GyroZ;
-  oldvalueTemp = Temp;
+//  oldvalueTemp = Temp;
   for(int avg = 0;avg < 50;avg++){
     getValues();
     newvalueAccelX = AccX;
@@ -207,33 +176,24 @@ void loop() {
     newvalueGyroX = GyroX;
     newvalueGyroY = GyroY;
     newvalueGyroZ = GyroZ;
-    newvalueTemp = Temp;
+//    newvalueTemp = Temp;
     oldvalueAccelX = (oldvalueAccelX + newvalueAccelX)/2;
     oldvalueAccelY = (oldvalueAccelY + newvalueAccelY)/2;
     oldvalueAccelZ = (oldvalueAccelZ + newvalueAccelZ)/2;
     oldvalueGyroX = (oldvalueGyroX + newvalueGyroX)/2;
     oldvalueGyroY = (oldvalueGyroY + newvalueGyroY)/2;
     oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
-    oldvalueTemp = (oldvalueTemp + newvalueTemp)/2;
+//    oldvalueTemp = (oldvalueTemp + newvalueTemp)/2;
   }
   tactValues(oldvalueAccelX,oldvalueAccelY, myValues);
   for (int i=0; i<=7; i++) {
     SoftPWMSet(vpins[i], scaler(myValues[i]));
   }
-  Serial.print("tact 0= ");
-  Serial.println(scaler(myValues[0]));
-  Serial.print("tact 1= ");
-  Serial.println(scaler(myValues[1]));
-  Serial.print("tact 2= ");
-  Serial.println(scaler(myValues[2]));
-  Serial.print("tact 3= ");
-  Serial.println(scaler(myValues[3]));
-  Serial.print("tact 4= ");
-  Serial.println(scaler(myValues[4]));
-  Serial.print("tact 5= ");
-  Serial.println(scaler(myValues[5]));
-  Serial.print("tact 6= ");
-  Serial.println(scaler(myValues[6]));
-  Serial.print("tact 7= ");
-  Serial.println(scaler(myValues[7]));
+
+  for(int i=0;i<8;i++){
+    Serial.print("tact ");
+    Serial.print(i);
+    Serial.print("= ");
+    Serial.println(scaler(myValues[i]));
+  }
 }
