@@ -10,7 +10,7 @@
 //Including the libraries used in the code
 #include <SoftPWM.h>
 #include<Wire.h>
-#include "TactNecklace.h"
+#include <TactNecklace.h>
 #define NUMPINS 7//assumed numbers for sketch
 #define NUMSAMPLES 150
 #define BAUDRATE 9600
@@ -23,7 +23,7 @@ void TactNecklace::begin(int* vPins) {
   Wire.write(0x6B);
   Wire.write(0);
   Wire.endTransmission(true);
-  if(!Serial){  Serial.begin(BAUDRATE)//start connections if it has not been started beforehand
+  if(!Serial){  Serial.begin(BAUDRATE);//start connections if it has not been started beforehand
 	  }
   for(int i=0; i<=NUMPINS; i++) {
     pinMode(*(vPins+i), OUTPUT);
@@ -56,7 +56,7 @@ void TactNecklace::begin(int* vPins) {
   Serial.print("Tactile Necklace Initialized");
 }
 //turns all vibrators on and then off to simulate a pulsation
-void TactNecklace::Pulse (){
+void TactNecklace::pulse (){
    for(int i=0; i<8; i++){
     SoftPWMSet(vpins[i],255);
    }
@@ -67,7 +67,7 @@ void TactNecklace::Pulse (){
   delay(125);
 }
 //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
-void TactNecklace::Circle (){
+void TactNecklace::circle (){
   for(int i=0; i<=7; i++){
     SoftPWMSet(vpins[i],255);
     delay(125);
@@ -75,8 +75,8 @@ void TactNecklace::Circle (){
   }
 }
 //acquires acceleration values and sends it to the vibrator pins which determines the strength of the vibration
-void TactNecklace:: sendVibration(){
-   getValues(); //get acc values
+void TactNecklace::  sendVibration(){
+  getValues(); //get acc values
   oldvalueAccelX = AccX;//setting acquired AccX value to oldvalueAccelX to be used in averaging
   oldvalueAccelY = AccY;
   oldvalueAccelZ = AccZ;
@@ -108,7 +108,6 @@ void TactNecklace:: sendVibration(){
     Serial.print(i);
     Serial.print("= ");
     Serial.println(scaler(myValues[i]));
-  }
   }
 }
 //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary

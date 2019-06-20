@@ -6,15 +6,16 @@
  *  https://github.com/AidenKunkler-Peck/Tactile-Necklace
 */
 //Including the libraries used in the code
-#include "TactNecklace.h"
+#include <TactNecklace.h>
 //establishing Global Variables
-TactNecklace myNecklace();
+TactNecklace myNecklace;
 //runs once, gets the necklace ready
 void setup() {
-  int vpins[8]={2,3,4,5,6,9,10,11};//sets pins to the Arduino ports
-  myNecklace.begin();//initializes communication with the Arduino
+  int vPins[8]={2,3,4,5,6,9,10,11};//sets pins to the Arduino ports
+  myNecklace.begin(vPins);//initializes communication with the Arduino
   myNecklace.circle();//vibrators pulsate one at a time clockwise
   myNecklace.pulse();//vibrators pulsate all at the same time
+  delay(500);//waits for pulse to be finishe bfore pulse is read
 }
 //runs forever
 void loop() {

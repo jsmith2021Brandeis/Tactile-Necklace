@@ -8,8 +8,8 @@
 //Including the libraries used in the code
 #include <SoftPWM.h>
 #include<Wire.h>
-
-#indef TactNecklace_h
+#include<Arduino.h>
+#ifndef TactNecklace_h
 #define TactNecklace_h
 class TactNecklace{
 	private:
@@ -45,13 +45,14 @@ class TactNecklace{
 		void tactValues(float accx, float accy, int* tactArray);
 		void getValues(); //get acc values
 	public:
-		void begin (int [] vpins); //initializes the function, this can't be in the constructor
-		void Circle (int [] vpins); //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
-		void Pulse (); //turns all vibrators on and then off to simulate a pulsation
+		void begin (int vpins[]); //initializes the function, this can't be in the constructor
+		void circle (); //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
+		void pulse (); //turns all vibrators on and then off to simulate a pulsation
 		int scaler(float input); //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
 		//  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
 		//  can adjust the scaler, but not required
-}
+		void sendVibration (); //acquires acceleration values and sends it to the vibrator pins which determines the strength of the vibration
+};
 #endif
 
  
