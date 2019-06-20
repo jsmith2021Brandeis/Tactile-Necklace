@@ -8,81 +8,15 @@
 //Including the libraries used in the code
 #include "TactNecklace.h"
 //establishing Global Variables
-
+TactNecklace myNecklace();
+//runs once, gets the necklace ready
 void setup() {
-  // put your setup code here, to run once:
-  SoftPWMBegin();
-  Wire.begin();
-  Wire.beginTransmission(MPU6050_addr);
-  Wire.write(0x6B);
-  Wire.write(0);
-  Wire.endTransmission(true);
-  Serial.begin(9600);
-  for(int i=0; i<=7; i++) {
-    pinMode(vpins[i], OUTPUT);
-  }
-  Circle();
-  Circle();
-  getValues(); //get acc values
-  oldvalueAccelX = AccX;
-  oldvalueAccelY = AccY;
-  oldvalueAccelZ = AccZ;
-  oldvalueGyroX = GyroX;
-  oldvalueGyroY = GyroY;
-  oldvalueGyroZ = GyroZ;
-  for(int avg = 0;avg < 150;avg++){
-    getValues();
-    newvalueAccelX = AccX;
-    newvalueAccelY = AccY;
-    newvalueAccelZ = AccZ;
-    newvalueGyroX = GyroX;
-    newvalueGyroY = GyroY;
-    newvalueGyroZ = GyroZ;
-    oldvalueAccelX = (oldvalueAccelX + newvalueAccelX)/2;
-    oldvalueAccelY = (oldvalueAccelY + newvalueAccelY)/2;
-    oldvalueAccelZ = (oldvalueAccelZ + newvalueAccelZ)/2;
-    oldvalueGyroX = (oldvalueGyroX + newvalueGyroX)/2;
-    oldvalueGyroY = (oldvalueGyroY + newvalueGyroY)/2;
-    oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
-  }
-  zerox=oldvalueAccelX;
-  zeroy=oldvalueAccelY;
-delay(500);
-Pulse();
-Pulse();
+  int vpins[8]={2,3,4,5,6,9,10,11};//sets pins to the Arduino ports
+  myNecklace.begin();//initializes communication with the Arduino
+  myNecklace.circle();//vibrators pulsate one at a time clockwise
+  myNecklace.pulse();//vibrators pulsate all at the same time
 }
+//runs forever
 void loop() {
-  getValues(); //get acc values
-  oldvalueAccelX = AccX;
-  oldvalueAccelY = AccY;
-  oldvalueAccelZ = AccZ;
-  oldvalueGyroX = GyroX;
-  oldvalueGyroY = GyroY;
-  oldvalueGyroZ = GyroZ;
-  for(int avg = 0;avg < 50;avg++){
-    getValues();
-    newvalueAccelX = AccX;
-    newvalueAccelY = AccY;
-    newvalueAccelZ = AccZ;
-    newvalueGyroX = GyroX;
-    newvalueGyroY = GyroY;
-    newvalueGyroZ = GyroZ;
-    oldvalueAccelX = (oldvalueAccelX + newvalueAccelX)/2;
-    oldvalueAccelY = (oldvalueAccelY + newvalueAccelY)/2;
-    oldvalueAccelZ = (oldvalueAccelZ + newvalueAccelZ)/2;
-    oldvalueGyroX = (oldvalueGyroX + newvalueGyroX)/2;
-    oldvalueGyroY = (oldvalueGyroY + newvalueGyroY)/2;
-    oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
-  }
-  tactValues(oldvalueAccelX,oldvalueAccelY, myValues);
-  for (int i=0; i<=7; i++) {
-    SoftPWMSet(vpins[i], scaler(myValues[i]));
-  }
-//for troubleshooting in the serial monitor
-  for(int i=0;i<8;i++){
-    Serial.print("tact ");
-    Serial.print(i);
-    Serial.print("= ");
-    Serial.println(scaler(myValues[i]));
-  }
+  myNecklace.sendVibration();//reads acceleration values and pulses vibrators on that axis
 }

@@ -1,0 +1,7 @@
+//defines keywords for text highlighting in the tactnecklace library
+KEYWORD1	TactNecklace
+KEYWORD2	begin
+KEYWORD2	sendVibration
+KEYWORD2	pulse
+KEYWORD2	circle
+KEYWORD2	scaler

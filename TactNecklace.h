@@ -12,7 +12,7 @@
 #indef TactNecklace_h
 #define TactNecklace_h
 class TactNecklace{
-	private{}
+	private:
 		float oldvalue;//used later in averaging formula
 		float newvalue;//used later in averaging formula
 		float oldvalueAccelX;//used for averaging accelerometer values in the x-axis (oldvalue and new value averaged to get an approximate accelerometer value) 
@@ -45,6 +45,7 @@ class TactNecklace{
 		void tactValues(float accx, float accy, int* tactArray);
 		void getValues(); //get acc values
 	public:
+		void begin (int [] vpins); //initializes the function, this can't be in the constructor
 		void Circle (int [] vpins); //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
 		void Pulse (); //turns all vibrators on and then off to simulate a pulsation
 		int scaler(float input); //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
