@@ -8,38 +8,38 @@
 //Including the libraries used in the code
 #include <SoftPWM.h>
 #include<Wire.h>
-
-//establishing Global Variables
-float oldvalue;//used later in averaging formula
-float newvalue;//used later in averaging formula
-float oldvalueAccelX;//used for averaging accelerometer values in the x-axis (oldvalue and new value averaged to get an approximate accelerometer value) 
-float oldvalueAccelY;//... y-axis
-float oldvalueAccelZ;//... z-axis
-float oldvalueGyroX;//used for averaging gyroscope values in the x-axis (oldvalue and new value averaged to get an approximate gyroscope value) 
-float oldvalueGyroY;//... y-axis
-float oldvalueGyroZ;//... z-axis
-float newvalueAccelX;//used for averaging accelerometer values in the x-axis (oldvalue and new value averaged to get an approximate accelerometer value) 
-float newvalueAccelY;//... y-axis
-float newvalueAccelZ;//... z-axis
-float newvalueGyroX;//used for averaging gyroscope values in the x-axis (oldvalue and new value averaged to get an approximate gyroscope value) 
-float newvalueGyroY;//... y-axis
-float newvalueGyroZ;//... z-axis
-float zerox;//balance point for where the accelerometer is set in the x-axis (where no vibrators are on)
-float zeroy;//... y-axis
-float avgx;//acquire from averaging the old and new values 
-float avgy;//acquire from averaging the old and new values 
-int vpins[8]={2,3,4,5,6,9,10,11};//establishes what ports from the Arduino to use
-float accx=0; //accelerometer data is non integer values, with decimals
-float accy=0; //data inputted from sensor has x and y axes
-const int maxacc=16500;//Largest input value from accelerometer
-const int vMax=255;//max strength of vibrator is 255, exceeding 255 with overflow, the byte will read the 8 rightmost bits
-
-int myValues[8]; //defining a new array
-
-const int MPU6050_addr=0x68;
-int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
+#include "TactNecklace.h"
+//turns all vibrators on and then off to simulate a pulsation
+void TactNecklace::Pulse (){
+   for(int i=0; i<8; i++){
+    SoftPWMSet(vpins[i],255);
+   }
+  delay(125);
+  for(int i=0; i<8; i++){
+    SoftPWMSet(vpins[i],0);
+   }
+  delay(125);
+}
+//turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
+void TactNecklace::Circle (){
+  for(int i=0; i<=7; i++){
+    SoftPWMSet(vpins[i],255);
+    delay(125);
+    SoftPWMSet(vpins[i],0);
+  }
+}
+//want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
+//  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
+int TactNecklace::scaler(float input){
+  if (input<30){
+     return (0);
+  }
+  else {
+    return (50+(130*(input/255)));
+  }
+}
 //Beginning communication with the accelerometer/gyroscopre Arduino "Wire.beginTransmission"
-void getValues(){
+void TactNecklace::getValues(){
   Wire.beginTransmission(MPU6050_addr);
   Wire.write(0x3B);
   Wire.endTransmission(false);
@@ -52,7 +52,7 @@ void getValues(){
   GyroZ=Wire.read()<<8|Wire.read();
 }
 //Individual Vibraor Strength from 0-255
-void clearTacts(int*  tactArray) {
+void TactNecklace::clearTacts(int*  tactArray) {
   for (int i=0; i<=7; i++) {
       tactArray[i]=0;
   }
@@ -60,7 +60,7 @@ void clearTacts(int*  tactArray) {
 //tactValues=acquiring the vibrator strength values from the accelerometer/gyroscope Arduino
 //tactArray=formula for converting Arduino acceleroemter/gyroscope values to output tactor strength values (each tactor has a seperate formula specific to the desired output of each vibrator relative to the orientation of the Arduino)
 //"if"/"else if"=if the conditions of the "if" function are met then the code within the function is carried out, if the conditions are not met the next "else if" function is evaluated
-void tactValues(float accx, float accy, int* tactArray){
+void TactNecklace::tactValues(float accx, float accy, int* tactArray){
   clearTacts(tactArray);
   if (accy<0 && accx>0){
      tactArray[0]=((abs(accy)-zeroy)/64)+30;
@@ -83,35 +83,8 @@ void tactValues(float accx, float accy, int* tactArray){
     tactArray[7]=sqrt(pow(accx-zerox,2)+pow(accy-zeroy,2))/64;
   }
 }
-//turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
-void Circle (){
-  for(int i=0; i<=7; i++){
-    SoftPWMSet(vpins[i],255);
-    delay(125);
-    SoftPWMSet(vpins[i],0);
-  }
-}
-//turns all vibrators on and then off to simulate a pulsation
-void Pulse (){
-   for(int i=0; i<8; i++){
-    SoftPWMSet(vpins[i],255);
-   }
-  delay(125);
-  for(int i=0; i<8; i++){
-    SoftPWMSet(vpins[i],0);
-   }
-  delay(125);
-}
-int scaler(float input){
-  if (input<30){
-     return (0);
-  }
-  else {
-    return (50+(130*(input/255))); //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
-//  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
-  }
-}
-void setup() {
+
+/*void setup() {
   // put your setup code here, to run once:
   SoftPWMBegin();
   Wire.begin();
@@ -187,4 +160,4 @@ void loop() {
     Serial.print("= ");
     Serial.println(scaler(myValues[i]));
   }
-}
+}*/
