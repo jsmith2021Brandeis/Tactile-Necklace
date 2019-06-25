@@ -33,7 +33,7 @@ class TactNecklace{
 		float zeroy;//... y-axis
 		float avgx;//acquire from averaging the old and new values 
 		float avgy;//acquire from averaging the old and new values 
-		int vpins[8]={2,3,4,5,6,9,10,11};//establishes what ports from the Arduino to use
+		int* vPins;//establishes what ports from the Arduino to use
 		float accx=0; //accelerometer data is non integer values, with decimals
 		float accy=0; //data inputted from sensor has x and y axes
 		const int maxacc=16500;//Largest input value from accelerometer

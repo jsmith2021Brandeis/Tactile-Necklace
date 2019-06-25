@@ -21,9 +21,11 @@ void TactNecklace::begin(int* vPins, int numPins) {
   Wire.write(0x6B);
   Wire.write(0);
   Wire.endTransmission(true);
+  Serial.println(numPins);
   this->numPins=numPins;
+  this->vPins=vPins;
   for(int i=0; i<numPins; i++) {
-    pinMode(*(vPins+i), OUTPUT);
+    pinMode((vPins[i]), OUTPUT);
   }
   getValues(); //get acc values
   oldvalueAccelX = AccX;
@@ -55,20 +57,20 @@ void TactNecklace::begin(int* vPins, int numPins) {
 //turns all vibrators on and then off to simulate a pulsation
 void TactNecklace::pulse (){
    for(int i=0; i<numPins; i++){
-    SoftPWMSet(vpins[i],255);
+    SoftPWMSet(vPins[i],255);
    }
   delay(125);
   for(int i=0; i<numPins; i++){
-    SoftPWMSet(vpins[i],0);
+    SoftPWMSet(vPins[i],0);
    }
   delay(125);
 }
 //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
 void TactNecklace::circle (){
   for(int i=0; i<numPins; i++){
-    SoftPWMSet(vpins[i],255);
+    SoftPWMSet(vPins[i],255);
     delay(125);
-    SoftPWMSet(vpins[i],0);
+    SoftPWMSet(vPins[i],0);
   }
 }
 //acquires acceleration values and sends it to the vibrator pins which determines the strength of the vibration
@@ -97,7 +99,7 @@ void TactNecklace::  sendVibration(){
   }
   tactValues(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for vibrators
   for (int i=0; i<=numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
-    SoftPWMSet(vpins[i], scaler(myValues[i]));
+    SoftPWMSet(vPins[i], scaler(myValues[i]));
   }
 //for troubleshooting in the serial monitor
   for(int i=0;i<numPins;i++){
