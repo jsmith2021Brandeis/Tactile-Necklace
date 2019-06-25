@@ -11,6 +11,8 @@
 #include<Arduino.h>
 #ifndef TactNecklace_h
 #define TactNecklace_h
+//create macro to get length of array
+#define ARRAY_SIZE(arr)((sizeof(arr))/sizeof(arr[0]))
 class TactNecklace{
 	private:
 		float oldvalue;//used later in averaging formula
@@ -36,7 +38,7 @@ class TactNecklace{
 		float accy=0; //data inputted from sensor has x and y axes
 		const int maxacc=16500;//Largest input value from accelerometer
 		const int vMax=255;//max strength of vibrator is 255, exceeding 255 with overflow, the byte will read the 8 rightmost bits
-
+		int numPins;
 		int myValues[8]; //defining a new array
 
 		const int MPU6050_addr=0x68;
@@ -45,7 +47,7 @@ class TactNecklace{
 		void tactValues(float accx, float accy, int* tactArray);
 		void getValues(); //get acc values
 	public:
-		void begin (int vpins[]); //initializes the function, this can't be in the constructor
+		void begin (int vpins[], int numPins); //initializes the function, this can't be in the constructor
 		void circle (); //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
 		void pulse (); //turns all vibrators on and then off to simulate a pulsation
 		int scaler(float input); //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary

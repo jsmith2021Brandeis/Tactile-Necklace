@@ -11,11 +11,9 @@
 #include <SoftPWM.h>
 #include<Wire.h>
 #include <TactNecklace.h>
-#define NUMPINS 7//assumed numbers for sketch
 #define NUMSAMPLES 150
-#define BAUDRATE 9600
 //constructor to create a TactNecklace object
-void TactNecklace::begin(int* vPins) {
+void TactNecklace::begin(int* vPins, int numPins) {
   // put your setup code here, to run once:
   SoftPWMBegin();
   Wire.begin();
@@ -23,9 +21,8 @@ void TactNecklace::begin(int* vPins) {
   Wire.write(0x6B);
   Wire.write(0);
   Wire.endTransmission(true);
-  if(!Serial){  Serial.begin(BAUDRATE);//start connections if it has not been started beforehand
-	  }
-  for(int i=0; i<=NUMPINS; i++) {
+  this->numPins=numPins;
+  for(int i=0; i<numPins; i++) {
     pinMode(*(vPins+i), OUTPUT);
   }
   getValues(); //get acc values
@@ -57,18 +54,18 @@ void TactNecklace::begin(int* vPins) {
 }
 //turns all vibrators on and then off to simulate a pulsation
 void TactNecklace::pulse (){
-   for(int i=0; i<8; i++){
+   for(int i=0; i<numPins; i++){
     SoftPWMSet(vpins[i],255);
    }
   delay(125);
-  for(int i=0; i<8; i++){
+  for(int i=0; i<numPins; i++){
     SoftPWMSet(vpins[i],0);
    }
   delay(125);
 }
 //turns on each tactor individually then turns that same tactor off so that the vibrators turn on in a circle
 void TactNecklace::circle (){
-  for(int i=0; i<=7; i++){
+  for(int i=0; i<numPins; i++){
     SoftPWMSet(vpins[i],255);
     delay(125);
     SoftPWMSet(vpins[i],0);
@@ -99,11 +96,11 @@ void TactNecklace::  sendVibration(){
     oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
   }
   tactValues(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for vibrators
-  for (int i=0; i<=7; i++) {//sets each accelerometer value to the designated ping (1-8)
+  for (int i=0; i<=numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
     SoftPWMSet(vpins[i], scaler(myValues[i]));
   }
 //for troubleshooting in the serial monitor
-  for(int i=0;i<8;i++){
+  for(int i=0;i<numPins;i++){
     Serial.print("tact ");
     Serial.print(i);
     Serial.print("= ");
@@ -135,7 +132,7 @@ void TactNecklace::getValues(){
 }
 //Individual Vibraor Strength from 0-255
 void TactNecklace::clearTacts(int*  tactArray) {
-  for (int i=0; i<=7; i++) {
+  for (int i=0; i<=numPins; i++) {
       tactArray[i]=0;
   }
 }

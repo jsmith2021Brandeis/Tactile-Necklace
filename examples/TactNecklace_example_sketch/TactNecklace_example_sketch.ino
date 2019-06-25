@@ -11,11 +11,14 @@
 TactNecklace myNecklace;
 //runs once, gets the necklace ready
 void setup() {
-  int vPins[8]={2,3,4,5,6,9,10,11};//sets pins to the Arduino ports
-  myNecklace.begin(vPins);//initializes communication with the Arduino
+  //<-- This symbol causes the computer to ignore the code to the right of it.
+  //In the case below, use it to remove the list of virtual pins that are not in use. 
+  int vPin[]s={2,3,4,5,6,9,10,11};//sets pins to the Arduino ports on Arduino Nano with 8 tactors
+  //int vPins[]={3,5,6,9};//sets pins to the Arduino ports on Arduino Uno with 4 tactors
+  myNecklace.begin(vPins, ARRAY_SIZE(vPins));//initializes communication with the Arduino
   myNecklace.circle();//vibrators pulsate one at a time clockwise
   myNecklace.pulse();//vibrators pulsate all at the same time
-  delay(500);//waits for pulse to be finishe bfore pulse is read
+  delay(500);//waits for pulse to be finish before pulse is read
 }
 //runs forever
 void loop() {
