@@ -52,7 +52,7 @@ void TactNecklace::begin(int* vPins, int numPins) {
   zerox=oldvalueAccelX;
   zeroy=oldvalueAccelY;
   delay(500);
-  Serial.print("Tactile Necklace Initialized");
+  Serial.println("Tactile Necklace Initialized");
 }
 //turns all vibrators on and then off to simulate a pulsation
 void TactNecklace::pulse (){
@@ -98,7 +98,7 @@ void TactNecklace::  sendVibration(){
     oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
   }
   tactValues(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for vibrators
-  for (int i=0; i<=numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
+  for (int i=0; i<numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
     SoftPWMSet(vPins[i], scaler(myValues[i]));
   }
 //for troubleshooting in the serial monitor
@@ -134,7 +134,7 @@ void TactNecklace::getValues(){
 }
 //Individual Vibraor Strength from 0-255
 void TactNecklace::clearTacts(int*  tactArray) {
-  for (int i=0; i<=numPins; i++) {
+  for (int i=0; i<numPins; i++) {
       tactArray[i]=0;
   }
 }
@@ -145,22 +145,22 @@ void TactNecklace::tactValues(float accx, float accy, int* tactArray){
   clearTacts(tactArray);
   if (accy<0 && accx>0){
      tactArray[0]=((abs(accy)-zeroy)/64)+30;
-     tactArray[1]=sqrt(pow(accx-zerox,2)+pow(accy+zeroy,2))/64;
-     tactArray[2]=(accx-zerox)/64;  
+     //tactArray[1]=sqrt(pow(accx-zerox,2)+pow(accy+zeroy,2))/64;
+     //tactArray[2]=(accx-zerox)/64;  
   }
   else if (accy<0 && accx<0){
-    tactArray[2]=(abs(accx)-zerox)/64;
-    tactArray[3]=sqrt(pow(accx+zerox,2)+pow(accy+zeroy,2))/64;
-    tactArray[4]=((abs(accy)-zeroy)/64)+30;
+    tactArray[1]=(abs(accx)-zerox)/64;
+    //tactArray[3]=sqrt(pow(accx+zerox,2)+pow(accy+zeroy,2))/64;
+   ///tactArray[4]=((abs(accy)-zeroy)/64)+30;
   }
   else if (accy>0 && accx<0){
-    tactArray[4]=(abs(accy-zeroy)/64)+30;
-    tactArray[5]=sqrt(pow(accx+zerox,2)+pow(accy-zeroy,2))/64;
-    tactArray[6]=(abs(accx)-zerox)/64;  
+    tactArray[2]=(abs(accy-zeroy)/64)+30;
+    //tactArray[5]=sqrt(pow(accx+zerox,2)+pow(accy-zeroy,2))/64;
+    //tactArray[6]=(abs(accx)-zerox)/64;  
   }
   else if (accy>0 && accx>0){
-    tactArray[0]=((accy-zeroy)/64)+30;  
-    tactArray[6]=(abs(accx)-zerox)/64;
-    tactArray[7]=sqrt(pow(accx-zerox,2)+pow(accy-zeroy,2))/64;
+    tactArray[3]=((accy-zeroy)/64)+30;  
+    //tactArray[6]=(abs(accx)-zerox)/64;
+   // tactArray[7]=sqrt(pow(accx-zerox,2)+pow(accy-zeroy,2))/64;
   }
 }
