@@ -44,7 +44,8 @@ class TactNecklace{
 		const int MPU6050_addr=0x68;
 		int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
 		void clearTacts(int*  tactArray) ;
-		void tactValues(float accx, float accy, int* tactArray);
+		void tactValues8(float accx, float accy, int* tactArray);
+		void tactValues4(float accx, float accy, int* tactArray);
 		void getValues(); //get acc values
 	public:
 		void begin (int vpins[], int numPins); //initializes the function, this can't be in the constructor

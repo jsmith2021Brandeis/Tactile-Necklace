@@ -82,7 +82,7 @@ void TactNecklace::  sendVibration(){
   oldvalueGyroX = GyroX;
   oldvalueGyroY = GyroY;
   oldvalueGyroZ = GyroZ;
-  for(int avg = 0;avg < 50;avg++){//for loop for averaging (averaged 50 times)
+  for(int avg = 0;avg < 3;avg++){//for loop for averaging (averaged 50 times)
     getValues();//get values again and name them new values to be used in averaging 
     newvalueAccelX = AccX;
     newvalueAccelY = AccY;
@@ -97,17 +97,34 @@ void TactNecklace::  sendVibration(){
     oldvalueGyroY = (oldvalueGyroY + newvalueGyroY)/2;
     oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
   }
-  tactValues(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for vibrators
+//for troubleshooting in the serial monitor
+  Serial.print("tact #:power");
+  for(int i=0;i<numPins;i++){
+    Serial.print("\t");
+    Serial.print(scaler(myValues[i]));
+	Serial.print("\t");
+  }
+  Serial.print("AccelX:");
+  Serial.print(oldvalueAccelX);
+  Serial.print("\t");
+  Serial.print("ZeroX:");
+  Serial.print(zerox);
+  Serial.print("\t");
+  Serial.print("AccelY:");
+  Serial.print(oldvalueAccelY);
+  Serial.print("\t");
+  Serial.print("ZeroY:");
+  Serial.println(zeroy);  
+  if (numPins==8){
+	tactValues8(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 8 vibrators
+	}
+	else {
+		tactValues4(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 4 vibrators
+	}
   for (int i=0; i<numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
     SoftPWMSet(vPins[i], scaler(myValues[i]));
   }
-//for troubleshooting in the serial monitor
-  for(int i=0;i<numPins;i++){
-    Serial.print("tact ");
-    Serial.print(i);
-    Serial.print("= ");
-    Serial.println(scaler(myValues[i]));
-  }
+
 }
 //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
 //  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
@@ -138,29 +155,61 @@ void TactNecklace::clearTacts(int*  tactArray) {
       tactArray[i]=0;
   }
 }
-//tactValues=acquiring the vibrator strength values from the accelerometer/gyroscope Arduino
+//tactValues8=acquiring the vibrator strength values from the accelerometer/gyroscope Arduino with 8 tactors
+//tactValues4=acquiring the vibrator strength values from the accelerometer/gyroscope Arduino with 4 tactors
 //tactArray=formula for converting Arduino acceleroemter/gyroscope values to output tactor strength values (each tactor has a seperate formula specific to the desired output of each vibrator relative to the orientation of the Arduino)
 //"if"/"else if"=if the conditions of the "if" function are met then the code within the function is carried out, if the conditions are not met the next "else if" function is evaluated
-void TactNecklace::tactValues(float accx, float accy, int* tactArray){
+void TactNecklace::tactValues8(float accx, float accy, int* tactArray){
   clearTacts(tactArray);
   if (accy<0 && accx>0){
-     tactArray[0]=((abs(accy)-zeroy)/64)+30;
-     //tactArray[1]=sqrt(pow(accx-zerox,2)+pow(accy+zeroy,2))/64;
-     //tactArray[2]=(accx-zerox)/64;  
+    tactArray[0]=((abs(accy)-zeroy)/64)+30;
+    tactArray[1]=sqrt(pow(accx-zerox,2)+pow(accy+zeroy,2))/64;
+    tactArray[2]=(accx-zerox)/64;
+	Serial.print("Q1");
+	Serial.println("\t");
   }
   else if (accy<0 && accx<0){
-    tactArray[1]=(abs(accx)-zerox)/64;
-    //tactArray[3]=sqrt(pow(accx+zerox,2)+pow(accy+zeroy,2))/64;
-   ///tactArray[4]=((abs(accy)-zeroy)/64)+30;
+    tactArray[2]=(abs(accx)-zerox)/64;
+    tactArray[3]=sqrt(pow(accx+zerox,2)+pow(accy+zeroy,2))/64;
+	tactArray[4]=((abs(accy)-zeroy)/64)+30;
+	Serial.print("Q2");
+	Serial.println("\t");
   }
   else if (accy>0 && accx<0){
-    tactArray[2]=(abs(accy-zeroy)/64)+30;
-    //tactArray[5]=sqrt(pow(accx+zerox,2)+pow(accy-zeroy,2))/64;
-    //tactArray[6]=(abs(accx)-zerox)/64;  
+    tactArray[4]=(abs(accy-zeroy)/64)+30;
+    tactArray[5]=sqrt(pow(accx+zerox,2)+pow(accy-zeroy,2))/64;
+    tactArray[6]=(abs(accx)-zerox)/64;
+	Serial.print("Q3");	
+	Serial.println("\t");
   }
   else if (accy>0 && accx>0){
-    tactArray[3]=((accy-zeroy)/64)+30;  
-    //tactArray[6]=(abs(accx)-zerox)/64;
-   // tactArray[7]=sqrt(pow(accx-zerox,2)+pow(accy-zeroy,2))/64;
+    tactArray[0]=((accy-zeroy)/64)+30;  
+    tactArray[6]=(abs(accx)-zerox)/64;
+    tactArray[7]=sqrt(pow(accx-zerox,2)+pow(accy-zeroy,2))/64;
+	Serial.print("Q4");
+	Serial.println("\t");
+  }
+}
+void TactNecklace::tactValues4(float accx, float accy, int* tactArray){
+  clearTacts(tactArray);
+  if (accy<0 && accx>0){
+	tactArray[0]=((abs(accy)-zeroy)/64)+30;
+	Serial.print("Q1");
+	Serial.println("\t");
+  }
+  else if (accy<0 && accx<0){
+	tactArray[1]=(abs(accx)-zerox)/64;
+	Serial.print("Q2");
+	Serial.println("\t");
+  }
+  else if (accy>0 && accx<0){
+	tactArray[2]=((abs(accy)-zeroy)/64)+30;
+	Serial.print("Q3");	
+	Serial.println("\t");	
+  }
+  else if (accy>0 && accx>0){
+	tactArray[3]=(abs(accx)-zerox)/64;
+	Serial.print("Q4");
+	Serial.println("\t");
   }
 }
