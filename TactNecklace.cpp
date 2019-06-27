@@ -12,6 +12,7 @@
 #include<Wire.h>
 #include <TactNecklace.h>
 #define NUMSAMPLES 150
+#if defined (ARDUINO_AVR_UNO)|| defined (ARDUINO_AVR_NANO)
 //constructor to create a TactNecklace object
 void TactNecklace::begin(int* vPins, int numPins) {
   // put your setup code here, to run once:
@@ -24,7 +25,8 @@ void TactNecklace::begin(int* vPins, int numPins) {
   Serial.println(numPins);
   this->numPins=numPins;
   if (numPins!=4&&numPins!=8){
-	 Serial.println("Program not compatible with the number of pins you are currently using. Please use either 4 or 8 pins.");
+	 Serial.println("Program not compatible with the number of pins you are currently using. Please use either 4 or 8 pins.");//Error statement if 4 or 8 pins aren't used by the Arduino.
+	 //Infinite loop to stop program from running. Works because 1 is always equal to 1, so nothing happens as long as it is true.
 	 while (1==1){
 	 }
   }
@@ -123,7 +125,8 @@ void TactNecklace::  sendVibration(){
   if (numPins==8){
 	tactValues8(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 8 vibrators
 	}
-	else if(numPins==4){
+	//We know that this must be 4 pins because in the initialization, the only possibilities that cause the program to run are 4 pins and 8 pins. And if it's nto 8 pins, then the only remaining option is 4 pins.
+	else {
 		tactValues4(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 4 vibrators
 	}
   for (int i=0; i<numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
@@ -218,3 +221,5 @@ void TactNecklace::tactValues4(float accx, float accy, int* tactArray){
 	Serial.println("\t");
   }
 }
+#else
+#endif

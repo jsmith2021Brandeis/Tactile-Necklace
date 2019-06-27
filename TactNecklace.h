@@ -11,6 +11,7 @@
 #include<Arduino.h>
 #ifndef TactNecklace_h
 #define TactNecklace_h
+#if defined (ARDUINO_AVR_UNO)|| defined (ARDUINO_AVR_NANO)
 //create macro to get length of array
 #define ARRAY_SIZE(arr)((sizeof(arr))/sizeof(arr[0]))
 class TactNecklace{
@@ -56,6 +57,8 @@ class TactNecklace{
 		//  can adjust the scaler, but not required
 		void sendVibration (); //acquires acceleration values and sends it to the vibrator pins which determines the strength of the vibration
 };
+#else 
+	#warning YOU ARE USING THE WRONG BOARD. CHANGE TO AN ARDUINO UNO OR ARDUINO NANO!
 #endif
-
+#endif
  
