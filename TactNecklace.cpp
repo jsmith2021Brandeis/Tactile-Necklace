@@ -23,6 +23,11 @@ void TactNecklace::begin(int* vPins, int numPins) {
   Wire.endTransmission(true);
   Serial.println(numPins);
   this->numPins=numPins;
+  if (numPins!=4&&numPins!=8){
+	 Serial.println("Program not compatible with the number of pins you are currently using. Please use either 4 or 8 pins.");
+	 while (1==1){
+	 }
+  }
   this->vPins=vPins;
   for(int i=0; i<numPins; i++) {
     pinMode((vPins[i]), OUTPUT);
@@ -118,7 +123,7 @@ void TactNecklace::  sendVibration(){
   if (numPins==8){
 	tactValues8(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 8 vibrators
 	}
-	else {
+	else if(numPins==4){
 		tactValues4(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 4 vibrators
 	}
   for (int i=0; i<numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
