@@ -45,8 +45,8 @@ class TactNecklace{
 		const int MPU6050_addr=0x68;
 		int16_t AccX,AccY,AccZ,GyroX,GyroY,GyroZ;
 		void clearTacts(int*  tactArray) ;
-		void tactValues8(float accx, float accy, int* tactArray);
-		void tactValues4(float accx, float accy, int* tactArray);
+		void tactValues8a(float accx, float accy, int* tactArray);
+		void tactValues4a(float accx, float accy, int* tactArray);
 		void getValues(); //get acc values
 	public:
 		void begin (int vpins[], int numPins); //initializes the function, this can't be in the constructor
@@ -55,7 +55,8 @@ class TactNecklace{
 		int scaler(float input); //want your min to be 34 because it is at the point where it first starts to be noticeable, max is lower than 255 because that is the maximum vibration strength we deemed necessary
 		//  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
 		//  can adjust the scaler, but not required
-		void sendVibration (); //acquires acceleration values and sends it to the vibrator pins which determines the strength of the vibration
+		void sendVibration (); //sends the vibrator pins values which determines the strength of the vibration
+		void readAccel (); //acquires acceleration values
 };
 #else 
 	#warning YOU ARE USING THE WRONG BOARD. CHANGE TO AN ARDUINO UNO OR ARDUINO NANO!

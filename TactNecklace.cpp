@@ -80,8 +80,8 @@ void TactNecklace::circle (){
     SoftPWMSet(vPins[i],0);
   }
 }
-//acquires acceleration values and sends it to the vibrator pins which determines the strength of the vibration
-void TactNecklace::  sendVibration(){
+//gets acceleration values from the accelerometer
+void TactNecklace:: readAccel(){
   getValues(); //get acc values
   oldvalueAccelX = AccX;//setting acquired AccX value to oldvalueAccelX to be used in averaging
   oldvalueAccelY = AccY;
@@ -104,6 +104,7 @@ void TactNecklace::  sendVibration(){
     oldvalueGyroY = (oldvalueGyroY + newvalueGyroY)/2;
     oldvalueGyroZ = (oldvalueGyroZ + newvalueGyroZ)/2;
   }
+
 //for troubleshooting in the serial monitor
   Serial.print("tact #:power");
   for(int i=0;i<numPins;i++){
@@ -121,13 +122,16 @@ void TactNecklace::  sendVibration(){
   Serial.print(oldvalueAccelY);
   Serial.print("\t");
   Serial.print("ZeroY:");
-  Serial.println(zeroy);  
+  Serial.println(zeroy);
+}
+//sends values to the vibrator pins which determines the strength of the vibration
+void TactNecklace::  sendVibration(){  
   if (numPins==8){
-	tactValues8(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 8 vibrators
+	tactValues8a(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 8 vibrators
 	}
 	//We know that this must be 4 pins because in the initialization, the only possibilities that cause the program to run are 4 pins and 8 pins. And if it's nto 8 pins, then the only remaining option is 4 pins.
 	else {
-		tactValues4(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 4 vibrators
+		tactValues4a(oldvalueAccelX,oldvalueAccelY, myValues);//sets accelerometer and gyroscope data to pins for 4 vibrators
 	}
   for (int i=0; i<numPins; i++) {//sets each accelerometer value to the designated ping (1-8)
     SoftPWMSet(vPins[i], scaler(myValues[i]));
@@ -167,7 +171,7 @@ void TactNecklace::clearTacts(int*  tactArray) {
 //tactValues4=acquiring the vibrator strength values from the accelerometer/gyroscope Arduino with 4 tactors
 //tactArray=formula for converting Arduino acceleroemter/gyroscope values to output tactor strength values (each tactor has a seperate formula specific to the desired output of each vibrator relative to the orientation of the Arduino)
 //"if"/"else if"=if the conditions of the "if" function are met then the code within the function is carried out, if the conditions are not met the next "else if" function is evaluated
-void TactNecklace::tactValues8(float accx, float accy, int* tactArray){
+void TactNecklace::tactValues8a(float accx, float accy, int* tactArray){
   clearTacts(tactArray);
   if (accy<0 && accx>0){
     tactArray[0]=((abs(accy)-zeroy)/64)+30;
@@ -198,7 +202,7 @@ void TactNecklace::tactValues8(float accx, float accy, int* tactArray){
 	Serial.println("\t");
   }
 }
-void TactNecklace::tactValues4(float accx, float accy, int* tactArray){
+void TactNecklace::tactValues4a(float accx, float accy, int* tactArray){
   clearTacts(tactArray);
   if (accy<0 && accx>0){
 	tactArray[0]=((abs(accy)-zeroy)/64)+30;
