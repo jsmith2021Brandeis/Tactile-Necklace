@@ -14,7 +14,7 @@
 #define NUMSAMPLES 150
 #if defined (ARDUINO_AVR_UNO)|| defined (ARDUINO_AVR_NANO)
 //constructor to create a TactNecklace object
-void TactNecklace::begin(int* vPins, int numPins) {
+void TactNecklace::begin(int* vPins, int numPins, string sensor) {
   // put your setup code here, to run once:
   SoftPWMBegin();
   Wire.begin();
@@ -81,7 +81,7 @@ void TactNecklace::circle (){
   }
 }
 //gets acceleration values from the accelerometer
-void TactNecklace:: readAccel(){
+int[] TactNecklace:: readAccel(){
   getValues(); //get acc values
   oldvalueAccelX = AccX;//setting acquired AccX value to oldvalueAccelX to be used in averaging
   oldvalueAccelY = AccY;

@@ -56,7 +56,7 @@ class TactNecklace{
 		//  needed to lower vibration strength even lower because voltage was increased from 5V to 7.4, so the new numbers are 69% of original numbers
 		//  can adjust the scaler, but not required
 		void sendVibration (); //sends the vibrator pins values which determines the strength of the vibration
-		void readAccel (); //acquires acceleration values
+		void readAccel (); //acquires acceleration values	
 };
 #else 
 	#warning YOU ARE USING THE WRONG BOARD. CHANGE TO AN ARDUINO UNO OR ARDUINO NANO!
