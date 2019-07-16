@@ -19,6 +19,6 @@ ajk6rzh@Virginia.edu
 
 jlam7@g.ucla.edu
 
-This Project Forked by Jacob Smith for Brandeis Mkaerlab Records
+This Project Forked by Jacob Smith for Brandeis Makerlab Records
 
 Clickup task ID #164d9u
